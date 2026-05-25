@@ -1,7 +1,7 @@
 #include "i2c.h"
 
-#include <stdio.h>
 #include "esp_log.h"
+#include <stdio.h>
 
 static const char *TAG = "sensors-i2c";
 
@@ -31,8 +31,7 @@ void i2c_master_scan(i2c_master_bus_handle_t bus)
 {
     ESP_LOGI(TAG, "Scanning I2C bus...");
 
-    for (uint8_t addr = 1; addr < 127; addr++)
-    {
+    for (uint8_t addr = 1; addr < 127; addr++) {
         i2c_device_config_t cfg = {
             .dev_addr_length = I2C_ADDR_BIT_LEN_7,
             .device_address = addr,
@@ -41,12 +40,10 @@ void i2c_master_scan(i2c_master_bus_handle_t bus)
 
         i2c_master_dev_handle_t dev;
 
-        if (i2c_master_bus_add_device(bus, &cfg, &dev) == ESP_OK)
-        {
+        if (i2c_master_bus_add_device(bus, &cfg, &dev) == ESP_OK) {
             esp_err_t err = i2c_master_probe(bus, addr, 100);
 
-            if (err == ESP_OK)
-            {
+            if (err == ESP_OK) {
                 ESP_LOGI(TAG, "Found device at 0x%02X", addr);
             }
 

@@ -1,9 +1,9 @@
 #include "sensors.h"
-#include "htu21d.h"
 #include "bmp280.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "htu21d.h"
 #include "osal/i2c.h"
 
 static const char *TAG = "sensor_app";
@@ -71,11 +71,7 @@ void sensor_app_update(void)
     float bmp_t, bmp_p;
     bmp280_get_measurement(&bmp, &bmp_t, &bmp_p);
 
-    ESP_LOGI(TAG,
-             "HTU21D: T=%.2fC H=%.2f%%",
-             t.value, h.value);
+    ESP_LOGI(TAG, "HTU21D: T=%.2fC H=%.2f%%", t.value, h.value);
 
-    ESP_LOGI(TAG,
-             "BMP280: T=%.2fC P=%.2fhPa\n",
-             bmp_t, bmp_p);
+    ESP_LOGI(TAG, "BMP280: T=%.2fC P=%.2fhPa\n", bmp_t, bmp_p);
 }
