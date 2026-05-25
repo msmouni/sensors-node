@@ -1,0 +1,3 @@
+[submodule "main/libsensors"]
+	path = main/libsensors
+	url = https://github.com/msmouni/libsensors.git
