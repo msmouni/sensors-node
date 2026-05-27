@@ -1,5 +1,6 @@
 #include "sensors.h"
 #include "bmp280.h"
+#include "data.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -13,6 +14,8 @@ static esp_i2c_t htu_i2c;
 
 static bmp280_t bmp;
 static esp_i2c_t bmp_i2c;
+
+static sensor_data_t g_sensor_data;
 
 int sensor_htu_init(i2c_master_bus_handle_t bus)
 {
@@ -33,7 +36,7 @@ int sensor_htu_init(i2c_master_bus_handle_t bus)
     return htu21d_init(&htu, &htu_i2c.osal);
 }
 
-int sensor_bmp_init(i2c_master_bus_handle_t bus)
+static int sensor_bmp_init(i2c_master_bus_handle_t bus)
 {
     i2c_device_config_t bmp_cfg = {
         .dev_addr_length = I2C_ADDR_BIT_LEN_7,
@@ -52,7 +55,7 @@ int sensor_bmp_init(i2c_master_bus_handle_t bus)
     return bmp280_init(&bmp, &bmp_i2c.osal);
 }
 
-void sensor_app_init(i2c_master_bus_handle_t bus)
+void sensors_init(i2c_master_bus_handle_t bus)
 {
     // HTU21D
     if (sensor_htu_init(bus))
@@ -63,15 +66,27 @@ void sensor_app_init(i2c_master_bus_handle_t bus)
         ESP_LOGE(TAG, "Failed to initialize BMP280 sensor");
 }
 
-void sensor_app_update(void)
+static void sensor_app_update(void)
 {
-    htu21d_measurement_t t = htu21d_read_temperature_no_hold(&htu);
-    htu21d_measurement_t h = htu21d_read_humidity_no_hold(&htu);
+    g_sensor_data.htu_temperature = htu21d_read_temperature_no_hold(&htu);
+    g_sensor_data.htu_humidity = htu21d_read_humidity_no_hold(&htu);
 
-    float bmp_t, bmp_p;
-    bmp280_get_measurement(&bmp, &bmp_t, &bmp_p);
+    bmp280_get_measurement(&bmp, &g_sensor_data.bmp_temperature, &g_sensor_data.bmp_pressure);
 
-    ESP_LOGI(TAG, "HTU21D: T=%.2fC H=%.2f%%", t.value, h.value);
+    sensors_data_set(&g_sensor_data);
 
-    ESP_LOGI(TAG, "BMP280: T=%.2fC P=%.2fhPa\n", bmp_t, bmp_p);
+    ESP_LOGI(TAG, "HTU21D: T=%.2fC H=%.2f%%", g_sensor_data.htu_temperature.value,
+             g_sensor_data.htu_humidity.value);
+
+    ESP_LOGI(TAG, "BMP280: T=%.2fC P=%.2fhPa\n", g_sensor_data.bmp_temperature,
+             g_sensor_data.bmp_pressure);
+}
+
+void sensor_task(void *arg)
+{
+    while (1) {
+        sensor_app_update();
+
+        vTaskDelay(pdMS_TO_TICKS(2000));
+    }
 }
