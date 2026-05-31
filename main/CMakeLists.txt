@@ -19,4 +19,5 @@ idf_component_register(
         "client"
         "wifi"
         "client/mqtt"
+    EMBED_TXTFILES "ca.crt"
 )

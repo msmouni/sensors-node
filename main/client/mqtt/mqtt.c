@@ -9,6 +9,9 @@
 
 static const char *TAG = "mqtt";
 
+extern const uint8_t ca_cert_start[] asm("_binary_ca_crt_start");
+extern const uint8_t ca_cert_end[] asm("_binary_ca_crt_end");
+
 static esp_mqtt_client_handle_t client;
 static bool mqtt_connected = false;
 
@@ -57,7 +60,10 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 
 int mqtt_app_start(void)
 {
-    esp_mqtt_client_config_t cfg = {.broker.address.uri = "mqtt://192.168.1.200:1883"};
+    esp_mqtt_client_config_t cfg = {
+        .broker.address.uri = "mqtts://192.168.1.200:8883",
+        .broker.verification.certificate = (const char *)ca_cert_start,
+    };
 
     ESP_LOGI(TAG, "[APP] Free memory: %" PRIu32 " bytes", esp_get_free_heap_size());
     client = esp_mqtt_client_init(&cfg);
