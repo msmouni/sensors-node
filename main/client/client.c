@@ -1,9 +1,12 @@
 #include "data.h"
 #include "esp_log.h"
+#include "mqtt.h"
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
-static const char *TAG = "tcp client";
+static const char *TAG = "sensors client";
+
+static const int DATA_SEND_PERIOD_MS = 20000;
 
 void tcp_client_task(void *arg)
 {
@@ -51,7 +54,27 @@ void tcp_client_task(void *arg)
                 break;
             }
 
+            vTaskDelay(pdMS_TO_TICKS(DATA_SEND_PERIOD_MS));
+        }
+    }
+}
+
+void mqtt_client_task(void *arg)
+{
+    if (mqtt_app_start() != 0) {
+        while (1) {
+            ESP_LOGE(TAG, "Failed to start MQTT client");
             vTaskDelay(pdMS_TO_TICKS(5000));
         }
+    }
+
+    while (1) {
+        sensor_data_t sensor_data;
+        sensors_data_get(&sensor_data);
+
+        mqtt_publish_sensor(sensor_data.htu_temperature.value, sensor_data.htu_humidity.value,
+                            sensor_data.bmp_temperature, sensor_data.bmp_pressure);
+
+        vTaskDelay(pdMS_TO_TICKS(DATA_SEND_PERIOD_MS));
     }
 }

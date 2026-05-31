@@ -9,6 +9,7 @@ idf_component_register(
         "client/client.c"
         "wifi/wifi.c"
         "sensors/data.c"
+        "client/mqtt/mqtt.c"
     INCLUDE_DIRS
         "."
         "sensors"
@@ -17,4 +18,5 @@ idf_component_register(
         "libsensors/bmp280"
         "client"
         "wifi"
+        "client/mqtt"
 )

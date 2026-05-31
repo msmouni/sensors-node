@@ -39,5 +39,5 @@ void app_main(void)
 
     xTaskCreate(sensor_task, "sensor_task", 4096, NULL, 5, NULL);
 
-    xTaskCreate(tcp_client_task, "tcp_task", 4096, NULL, 5, NULL);
+    xTaskCreate(mqtt_client_task, "mqtt_client_task", 4096, NULL, 5, NULL);
 }
