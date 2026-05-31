@@ -1,4 +1,4 @@
-menu "Sensors Network"
+menu "Sensors App"
 
 config WIFI_SSID
     string "WiFi SSID"
@@ -17,5 +17,13 @@ config HOST_IP_ADDR
 
 config HOST_PORT
     int "Host port"
+
+config SENSOR_READ_PERIOD_MS
+    int "Sensors read periodicity in ms"
+    default 20000
+
+config SENSOR_PUBLISH_PERIOD_MS
+    int "Sensors mqtt client publish periodicity in ms"
+    default 120000
 
 endmenu

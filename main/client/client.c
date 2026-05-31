@@ -6,8 +6,6 @@
 
 static const char *TAG = "sensors client";
 
-static const int DATA_SEND_PERIOD_MS = 20000;
-
 void tcp_client_task(void *arg)
 {
     while (1) {
@@ -54,7 +52,7 @@ void tcp_client_task(void *arg)
                 break;
             }
 
-            vTaskDelay(pdMS_TO_TICKS(DATA_SEND_PERIOD_MS));
+            vTaskDelay(pdMS_TO_TICKS(CONFIG_SENSOR_PUBLISH_PERIOD_MS));
         }
     }
 }
@@ -75,6 +73,6 @@ void mqtt_client_task(void *arg)
         mqtt_publish_sensor(sensor_data.htu_temperature.value, sensor_data.htu_humidity.value,
                             sensor_data.bmp_temperature, sensor_data.bmp_pressure);
 
-        vTaskDelay(pdMS_TO_TICKS(DATA_SEND_PERIOD_MS));
+        vTaskDelay(pdMS_TO_TICKS(CONFIG_SENSOR_PUBLISH_PERIOD_MS));
     }
 }
