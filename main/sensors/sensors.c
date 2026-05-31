@@ -9,6 +9,8 @@
 
 static const char *TAG = "sensor_app";
 
+static const int SENSORS_DATA_PERIOD_MS = 10000;
+
 static htu21d_t htu;
 static esp_i2c_t htu_i2c;
 
@@ -75,10 +77,10 @@ static void sensor_app_update(void)
 
     sensors_data_set(&g_sensor_data);
 
-    ESP_LOGI(TAG, "HTU21D: T=%.2fC H=%.2f%%", g_sensor_data.htu_temperature.value,
+    ESP_LOGD(TAG, "HTU21D: T=%.2fC H=%.2f%%", g_sensor_data.htu_temperature.value,
              g_sensor_data.htu_humidity.value);
 
-    ESP_LOGI(TAG, "BMP280: T=%.2fC P=%.2fhPa\n", g_sensor_data.bmp_temperature,
+    ESP_LOGD(TAG, "BMP280: T=%.2fC P=%.2fhPa\n", g_sensor_data.bmp_temperature,
              g_sensor_data.bmp_pressure);
 }
 
@@ -87,6 +89,6 @@ void sensor_task(void *arg)
     while (1) {
         sensor_app_update();
 
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(pdMS_TO_TICKS(SENSORS_DATA_PERIOD_MS));
     }
 }

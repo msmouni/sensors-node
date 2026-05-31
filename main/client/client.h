@@ -3,4 +3,6 @@
 
 void tcp_client_task(void *arg);
 
+void mqtt_client_task(void *arg);
+
 #endif /* SENSORS_TCP_CLIENT_H */
